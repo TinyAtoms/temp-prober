@@ -6,10 +6,10 @@
 #include <string>
 
 
-
 const char* ssid = "telew_f2b";
-const char* password = "b7acc42b";
+const char* password = "";
 const char* server = "https://webhook.site/55fe7c5b-a0be-40da-a694-b3dae02d94e2";
+const int DELAY = 30000; // 30 sec
 
 
 #define ONE_WIRE_BUS 25
@@ -17,6 +17,7 @@ const char* server = "https://webhook.site/55fe7c5b-a0be-40da-a694-b3dae02d94e2"
 OneWire oneWire(ONE_WIRE_BUS);
 // Pass our oneWire reference to Dallas Temperature sensor
 DallasTemperature sensors(&oneWire);
+HTTPClient http{};
 
 void setup(void)
 {
@@ -45,22 +46,20 @@ void loop(void){
   Serial.print(temp);
   Serial.print("\n");
   String jsonBody = "{'temp' : " + String(temp) + "}";
-  HTTPClient http{};
   http.begin(server);
   http.addHeader("Content-Type", "Content-Type: application/json");
   int httpResponseCode = http.POST(jsonBody); //Send the actual POST request
 
    if(httpResponseCode>0){
     String response = http.getString();  //Get the response to the request
-    Serial.println("code and response:");
+    Serial.println("code:");
     Serial.println(httpResponseCode);   //Print return code
-    Serial.println(response);           //Print request answer
   } else {
     Serial.print("Error on sending POST: ");
     Serial.println(httpResponseCode);
-    http.end();
    }
-   delay(10000);
+   http.end();
+   delay(DELAY/ 5);
   }
    else {
       Serial.println("WiFi Disconnected");
